@@ -1,0 +1,76 @@
+.mask{
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(33,33,33,0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .input-tel{
+        box-sizing: border-box;
+        padding: 20px;
+        background-color: #ffffff;
+        display: flex;
+        flex-wrap: wrap;
+        border-radius: 5px;
+        border-top-right-radius: 0px;
+        position: relative;
+
+        input{
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px 10px;
+            border: 1px solid #cdcdcd;
+            line-height: 38px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            color: #666666;
+        }
+
+        span{
+            width: 100%;
+            background-color: #1bbbbb;
+            color: #ffffff;
+            font-size: 0.6rem;
+            text-align: center;
+            line-height: 40px;
+            margin-top: 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        i{
+            width: 30px;
+            height: 30px;
+            background-color: #ffffff;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            position: absolute;
+            right: 0;
+            top: -30px;
+            font-style: normal;
+            font-size: 0.6rem;
+            text-align: center;
+            line-height: 30px;
+            color: #999999;
+            cursor: pointer;
+        }
+    }
+}
+
+
+@media all and (max-width: 599px) {
+    .input-tel{
+        width: 80%;
+    }
+}
+
+@media all and (min-width: 600px) {
+    .input-tel{
+        width: 30%;
+    }
+}

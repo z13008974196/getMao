@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+// helpers
+@import "helpers/global-variables";
+@import "helpers/mixins";
+@import "helpers/functions";
+
+// base
+@import "base/reset";
+@import "base/base";
+
+// components
+@import "components/loading-overlay";
+@import "components/btn-music";
+@import "components/up-arrow";
+@import "components/swiper-container";
+@import "components/swiper-slide";
+@import "components/icon-font";
+
+// sections
+@import "slides/slide-1";
+@import "slides/slide-2";
+@import "slides/slide-3";
+@import "slides/slide-4";
+
+// mask
+@import "slides/mask";
+
+
+
+@media all and (max-width: 599px) {
+    .whiteBac{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        padding: 1rem 0;
+        .item-image {
+            width: 8rem;
+            height: 8rem;
+            margin-bottom: 1rem;
+        }
+        .item-text {
+            width: 18rem;
+            .item-text-title{
+                display: block;
+                width: 100%;
+                color: #333333;
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+
+            .item-text-detail{
+                display: block;
+                width: 100%;
+                font-size: 0.8rem;
+                color: #333333;
+                margin-top: 0.8rem;
+                margin-bottom: 0.8rem;
+                line-height: 1.2rem;
+            }
+
+            .item-text-merit{
+                display: block;
+                width: 100%;
+                font-size: 0.8rem;
+                color: #333333;
+                margin-top: 0.4rem;
+                line-height: 1.2rem;
+            }
+        }
+    }
+}
+
+@media all and (min-width: 600px) {
+    .whiteBac{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+        padding: 1rem 0;
+        .item-image {
+            width: 12rem;
+            height: 12rem;
+        }
+        .item-text {
+            width: 18rem;
+            margin-left: 2rem;
+            .item-text-title{
+                display: block;
+                width: 100%;
+                color: #333333;
+                font-weight: bold;
+            }
+
+            .item-text-detail{
+                display: block;
+                width: 100%;
+                font-size: 0.6rem;
+                color: #333333;
+                margin-top: 0.4rem;
+                margin-bottom: 0.4rem;
+                line-height: 0.9rem;
+            }
+
+            .item-text-merit{
+                display: block;
+                width: 100%;
+                font-size: 0.5rem;
+                color: #333333;
+                margin-top: 0.4rem;
+                line-height: 0.9rem;
+            }
+        }
+    }
+}
