@@ -1,15 +1,4 @@
 # slidePage
-Demo:http://lipten.link/projects/slidePage/demo.html
-
-
-> slidePage 是一个简单却可以很强大的滚动插件，不提供各种花俏的UI组件，只提供实用的功能接口，方便二次开发。
-
-### -update v2.1-
-1.【实验性功能】加入移除页面和恢复被移除页面的methods(slidePage.remove()和slidePage.recover())。
-
-2.加入npm包管理。
-
-### Usage
 
 #### 1、下载slidePage
 npm安装

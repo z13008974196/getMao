@@ -5,6 +5,12 @@
     position: relative;
 }
 .slidePage-container .item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding-bottom: 40px;
     position: absolute;
     top: 0;
     left: 0;

@@ -1,0 +1,31 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html,body{
+    height: 100%;
+}
+
+html{
+    font-size: 62.5%;
+    font-family: "微软雅黑";
+}
+
+a{
+    text-decoration: none;
+    color: #72a7ee;
+}
+
+input{
+    outline: none;
+    -webkit-appearance: none;
+}
+
+em{
+    font-style: normal;
+}
+
+span,a{
+    display: inline-block;
+}

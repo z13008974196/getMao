@@ -1,0 +1,126 @@
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: arial;
+    text-align: center;
+}
+ul {
+    list-style: none;
+}
+.prev-page,.next-page{
+    display: block;
+    width: 25px;
+    height: 25px;
+    line-height: 26px;
+    position: absolute;
+    right: 2px;
+    z-index: 9999;
+    background: rgba(255,255,255,.5);
+    border-radius: 50%;
+    font-size: 14px;
+    color: #666;
+    text-align:center;
+}
+.prev-page{
+    top: 0;
+}
+.next-page{
+    bottom: 0;
+}
+.prev-page:active{
+    background: rgba(155,155,155,.5);
+}
+.next-page:active{
+    background: rgba(155,155,155,.5);
+}
+.pagination{
+    width: 30px;
+    height: auto;
+    position: fixed;
+    top: 50%;
+    right: 5px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 40px 0;
+    margin-top: -150px;
+}
+.pagination a{
+    width: 25px;
+    height: 25px;
+    display: block;
+    line-height: 28px;
+    text-align: center;
+    padding-left: 3px;
+}
+.pagination a:after{
+    content: "";
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    background: rgba(0,0,0,.5);
+    -webkit-transition: background .3s ease;
+    -moz-transition: background .3s ease;
+    -ms-transition: background .3s ease;
+    -o-transition: background .3s ease;
+    transition: background .3s ease;
+}
+.pagination a.active:after{
+    background: rgb(104,176,171);
+}
+.item h2{
+    margin:0;
+    padding:20px 0;
+}
+.play{
+    display: block;
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-top:-20px;
+    margin-left: -50px;
+    width:100px;
+    height:100px;
+    -webkit-border-radius:50%;
+    -moz-border-radius:50%;
+    border-radius:50%;
+    line-height: 100px;
+    background-color: rgb(178, 79, 65);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    text-decoration: none;
+}
+.play:hover{
+    background-color: rgb(189, 80, 66);
+}
+.play:active{
+    background-color: rgb(141, 60, 50);
+}
+.goto{
+    display: block;
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-top:-20px;
+    margin-left: -50px;
+    width:100px;
+    height:100px;
+    webkit-border-radius:50%;
+    -moz-border-radius:50%;
+    border-radius:50%;
+    line-height: 100px;
+    background-color: rgb(47, 95, 178);
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    text-decoration: none;
+}
+.goto:hover{
+    background-color: rgb(57, 123, 219);
+}
+.goto:active{
+    background-color: rgb(31, 79, 134);
+}
