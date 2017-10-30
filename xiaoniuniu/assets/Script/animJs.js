@@ -23,12 +23,11 @@ module.exports = {
         {name: '五花'},
         {name: '五小'}
     ],
-    aLength: 0,
-    sendACardI: 0,
+    sendACardI: 0, // 发牌循环用
     animBankerTipI: 0,
     bankerListInd: null,
     bankerSeat: null,
-
+    gameResult: null,
     //////////////////// 获取资源 ////////////////////
     getCardAsset: function(cardAsset){
         this.cardAsset = cardAsset;
@@ -57,8 +56,7 @@ module.exports = {
     ////////////////////// 发牌动画 //////////////////////
     // 创建节点和动画
     createPlayerAnim: function (animPlayerSeatList, aCardPool){
-        animPlayerSeatList.sort();
-        let enemy = null;
+        animPlayerSeatList.sort(); // 按顺序
         var cardindex = animPlayerSeatList.length * 5;
         var animCards = cc.find('Canvas/anim/anim_card');
         var cardGroup = cc.find('Canvas/gaming/card').children;
@@ -66,8 +64,7 @@ module.exports = {
             var poX = cardGroup[animPlayerSeatList[i]].position.x;
             var poY = cardGroup[animPlayerSeatList[i]].position.y;
             for (let ind = 1; ind <= 5; ind++) {
-                enemy = aCardPool.get();
-                animCards.addChild(enemy, cardindex--);
+                var enemy = aCardPool.get();
                 enemy.setPosition(cc.p(-51,0));
                 if(i == 0){
                     enemy.height = 130;
@@ -82,22 +79,22 @@ module.exports = {
                     var anim = cc.bezierBy(0.08, bezier);
                 }
 
+                animCards.addChild(enemy, cardindex--);
+
                 this.playerGroup.push(enemy);
                 this.animGroup.push(anim);
             }
         }
-        this.aLength = this.playerGroup.length;
     },
 
     //发牌动画(重复)
     sendACard: function(target, cb){
         var i = this.sendACardI;
         this.sendACardI += 1;
-        if(i == this.aLength){
+        if(i == this.playerGroup.length){
             this.selfUCardShow(cb);
             return;
         }
-
         var player = this.playerGroup[i];
         var amin = this.animGroup[i];
         var finished = cc.callFunc(this.sendACard, this, cb);
@@ -111,15 +108,15 @@ module.exports = {
             var finished = cc.callFunc(function(target, i){
                 if(i == 3){
                     // var finished = cc.callFunc(this.showBankerStep, this)
-                    this.myUCard[i].runAction(cc.scaleTo(0.5, 1, 1));
+                    this.myUCard[i].runAction(cc.scaleTo(0.25, 1, 1));
                     cb && cb();
                     return;
                 }else{
-                    this.myUCard[i].runAction(cc.scaleTo(0.5, 1, 1));
+                    this.myUCard[i].runAction(cc.scaleTo(0.25, 1, 1));
                 }
             }, this, i);
 
-            var aminSequence = cc.sequence(cc.scaleTo(0.5, 0, 1), finished);
+            var aminSequence = cc.sequence(cc.scaleTo(0.25, 0, 1), finished);
             this.playerGroup[i].runAction(aminSequence);
         }
     },
@@ -182,17 +179,13 @@ module.exports = {
             var banker_anim_finish = cc.callFunc(function(){
                 console.log('抢庄动画停止');
                 setTimeout(function(){
-                    for(let i in anim_banker_list){ // 删除对象池中的节点
-                        anim_banker_list[i].runAction(cc.removeSelf());
-                    }
-
                     // 添加庄家标识
                     tip_double.children[self.bankerSeat].getComponent(cc.Sprite).spriteFrame = self.tipDoubleAsset[0];
                     cb && cb();
-                }, 500)
+                }, 200)
                 return;
             }, this);
-            var tip_anim = cc.moveTo(0.8, cc.p(bankerX, 90));
+            var tip_anim = cc.moveTo(0.3, cc.p(bankerX, 90));
             var aminSequence = cc.sequence(tip_anim, banker_anim_finish);
             tip.runAction(aminSequence);
             return
@@ -212,23 +205,21 @@ module.exports = {
     selfLastACardAnim: function(){
         var finished = cc.callFunc(function(){
             var finished = cc.callFunc(this.slefNiuCardShow, this);
-            var aminSequence = cc.sequence(cc.scaleTo(0.5, 1, 1), finished);
+            var aminSequence = cc.sequence(cc.scaleTo(0.25, 1, 1), finished);
             this.myUCard[4].runAction(aminSequence); // 应用牌出现
         }, this);
-        var aminSequence = cc.sequence(cc.scaleTo(0.5, 0, 1), finished);
+        var aminSequence = cc.sequence(cc.scaleTo(0.25, 0, 1), finished);
         this.playerGroup[4].runAction(aminSequence);
     },
 
     slefNiuCardShow: function(){
         cc.find("Canvas/button/button_clicklast").active = false;
         cc.find("Canvas/button/button_clicklast_icon").active = false;
-        cc.find("Canvas/button/button_opencard").active = true;
-        // console.log(this.myCard);
         var myCard = this.myCard;
         if(myCard.type !=0){ // 有牛
             for(let i  in myCard.animation){
                 if(myCard.animation[i] == 0 || myCard.animation[i] == 1 || myCard.animation[i] == 2){
-                    this.myUCard[i].runAction(cc.moveBy(0.5, 0, 20));
+                    this.myUCard[i].runAction(cc.moveBy(0.25, 0, 20));
                 }
             }
         }
@@ -236,7 +227,7 @@ module.exports = {
 
     ////////////////////// 亮牌动画 //////////////////////
 
-    openCardAnim: function(data, playerListSort, selfId ,cb){
+    openCardAnim: function(data, playerListSort, selfName ,cb){
         this.allCardOver = data.checkout;
 
         this.makeSmallTotal(data.checkout);
@@ -246,7 +237,7 @@ module.exports = {
         var count = 0;
 
         for(let i in checkout){
-            if(i.split('*')[0] != selfId){ // 不是自己
+            if(i.split('*')[0] != selfName){ // 不是自己
                 var seat = playerListSort[i].seat;
                 var cardData = checkout[i].cardData;
                 for(let i = 0; i < 5; i++){
@@ -260,22 +251,17 @@ module.exports = {
     },
 
     otherUCardShow: function(otherCards, count ,cb){
-        // console.log('otherUCardShow');
-        // console.log(otherCards);
-        // console.log(count);
-
         for(let i = 0; i < 5; i++){
             var finished = cc.callFunc(function(target, i){
                 if(i == 4){
-                    otherCards[i].runAction(cc.scaleTo(0.5, 1, 1));
+                    otherCards[i].runAction(cc.scaleTo(0.25, 1, 1));
                     this.typeShow(otherCards);
                     cb && cb();
-                    // return true;
                 }else{
-                    otherCards[i].runAction(cc.scaleTo(0.5, 1, 1));
+                    otherCards[i].runAction(cc.scaleTo(0.25, 1, 1));
                 }
             }, this, i);
-            var aminSequence = cc.sequence(cc.scaleTo(0.5, 0, 1), finished);
+            var aminSequence = cc.sequence(cc.scaleTo(0.25, 0, 1), finished);
             this.playerGroup[count*5+i].runAction(aminSequence);
         }
     },
@@ -286,8 +272,6 @@ module.exports = {
         var playerListSort = this.playerListSort;
         var types = cc.find("Canvas/tip/tip_cardtype");
         types.active = true;
-        // console.log(allCardOver);
-        // console.log(playerListSort);
         for(let i in allCardOver){
             var typeind = allCardOver[i].type;
             if(playerListSort[i].seat == this.bankerSeat){
@@ -298,45 +282,70 @@ module.exports = {
             types.children[playerListSort[i].seat].getComponent(cc.Sprite).spriteFrame = this.tipTypeAsset[typeind];
         }
 
-        this.showSmallTotal();
+        var self = this;
+        setTimeout(function(){
+            self.showSmallTotal();
+        }, 500)
     },
 
     ////////////////////// 结算动画 //////////////////////
 
     showSmallTotal: function(){
-        // console.log('出结算');
-        setTimeout(function(){
-            cc.find('Canvas/mask').active = true;
-            var total_small = cc.find('Canvas/total/total_small');
-            total_small.active = true;
-            var total_small_show = cc.sequence(cc.scaleTo(0.1, 1.1, 1.1),cc.scaleTo(0.1, 0.9, 0.9),cc.scaleTo(0.1, 1, 1));
-            total_small.runAction(total_small_show);
-            cc.find("Canvas/button/button_opencard").active = false;
-        }, 500)
+        if(this.gameResult){
+            cc.find('Canvas/music/win').getComponent(cc.AudioSource).play();
+        }else{
+            cc.find('Canvas/music/lose').getComponent(cc.AudioSource).play();
+        }
+        cc.find('Canvas/mask').active = true;
+        var total_small = cc.find('Canvas/total/total_small');
+        total_small.active = true;
+        var total_small_show = cc.sequence(cc.scaleTo(0.1, 1.1, 1.1),cc.scaleTo(0.1, 0.9, 0.9),cc.scaleTo(0.1, 1, 1));
+        total_small.runAction(total_small_show);
+        cc.find("Canvas/button/button_opencard").active = false;
     },
 
     makeSmallTotal: function(allCardOver){
         console.log(allCardOver);
         //把结果的数据放到小结算的view上
-        var smallTotal = cc.find('Canvas/total/total_small');
+        var smallTotal = cc.find('Canvas/total/total_small/items');
+        var userInfo = cc.find('Canvas/user/user_info');
         var typeList = this.typeList;
         var ind = 0;
         for(let i in allCardOver){
             console.log(i);
             console.log(allCardOver[i]);
+            smallTotal.children[ind].active = true;
             var avatar = smallTotal.children[ind].children[0];
             var name = smallTotal.children[ind].children[1];
             var card = smallTotal.children[ind].children[2];
             var type = smallTotal.children[ind].children[3];
             var value = smallTotal.children[ind].children[4];
 
+            // info
+            avatar.getComponent(cc.Sprite).spriteFrame = new cc.SpriteFrame(this.playerListSort[i].avatar);
             name.getComponent(cc.Label).string = allCardOver[i].userId.split('*')[0];
             type.getComponent(cc.Label).string = typeList[allCardOver[i].type].name;
             value.getComponent(cc.Label).string = allCardOver[i].amount;
-
             for(let j = 0; j < 5; j++){
                 card.children[j].getComponent(cc.Sprite).spriteFrame = this.cardAsset[allCardOver[i].cardData[j]];
             }
+
+            // 颜色
+            if(allCardOver[i].amount < 0){
+                this.gameResult = false;
+                name.color = new cc.Color(205, 66, 67);
+                type.color  = new cc.Color(205, 66, 67);
+                value.color = new cc.Color(205, 66, 67);
+            }else{
+                this.gameResult = true;
+                name.color = new cc.Color(67, 144, 67);
+                type.color  = new cc.Color(67, 144, 67);
+                value.color = new cc.Color(67, 144, 67);
+            }
+
+            // 对应游戏坐位分数
+            userInfo.children[this.playerListSort[i].seat].children[2].children[1].getComponent(cc.Label).string = allCardOver[i].amount;
+
             ind++;
         }
     }

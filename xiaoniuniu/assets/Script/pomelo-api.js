@@ -5,9 +5,9 @@ module.exports = {
     port: 3014,
 
     watcher: function(
-        onAnimTimeOut,
-        onAnimOver,
         onAnimPost,
+        onAnimOver,
+        onAnimTimeout,
         onTimerStart,
         onSeatTake,
         onSeatLeave,
@@ -25,19 +25,68 @@ module.exports = {
         onRoomBusy,
         onGameOver
     ) {
-        for (let index in arguments) {
-            var route = arguments[index].name.substring(6);
-            // console.log(route);
-            pomelo.on(route, (data) => {
-                arguments[index] && arguments[index](data)
-            });
-        }
+        pomelo.on('onAnimPost', (data) => {
+            onAnimPost(data)
+        });
+        pomelo.on('onAnimOver', (data) => {
+            onAnimOver(data)
+        });
+        pomelo.on('onAnimTimeout', (data) => {
+            onAnimTimeout(data)
+        });
+        pomelo.on('onTimerStart', (data) => {
+            onTimerStart(data)
+        });
+        pomelo.on('onSeatTake', (data) => {
+            onSeatTake(data)
+        });
+        pomelo.on('onSeatLeave', (data) => {
+            onSeatLeave(data)
+        });
+        pomelo.on('onSeatBusy', (data) => {
+            onSeatBusy(data)
+        });
+        pomelo.on('onReadyPost', (data) => {
+            onReadyPost(data)
+        });
+        pomelo.on('onReadyOver', (data) => {
+            onReadyOver(data)
+        });
+        pomelo.on('onBankerPost', (data) => {
+            onBankerPost(data)
+        });
+        pomelo.on('onBankerOver', (data) => {
+            onBankerOver(data)
+        });
+        pomelo.on('onDoublePost', (data) => {
+            onDoublePost(data)
+        });
+        pomelo.on('onDoubleOver', (data) => {
+            onDoubleOver(data)
+        });
+        pomelo.on('onOpenPost', (data) => {
+            onOpenPost(data)
+        });
+        pomelo.on('onOpenOver', (data) => {
+            onOpenOver(data)
+        });
+        pomelo.on('onNextPost', (data) => {
+            onNextPost(data)
+        });
+        pomelo.on('onNextOver', (data) => {
+            onNextOver(data)
+        });
+        pomelo.on('onRoomBusy', (data) => {
+            onRoomBusy(data)
+        });
+        pomelo.on('onGameOver', (data) => {
+            onGameOver(data)
+        });
     },
-
     // --------------------------------------- init --------------------------------------- //
 
     getRoomId: function() {
-        return '10002';
+        return '10010';
         // 从url获取
     },
 

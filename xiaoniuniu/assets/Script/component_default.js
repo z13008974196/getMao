@@ -17,7 +17,9 @@ cc.Class({
             user_info_item[i].active = false;
         } // 游戏中用户信息区
 
-        cc.find("Canvas/anim/anim_start").active = false; // 开始动画节点
+        cc.find('Canvas/anim/anim_card').active = false; // 动画牌
+
+        cc.find("Canvas/anim/anim_start_img").active = false; // 开始动画节点
         cc.find("Canvas/anim/anim_banker").active = false; // 抢庄动画节点
         cc.find("Canvas/anim/anim_banker_tip").active = false; // 抢庄标志
         cc.find("Canvas/button/button_banker").active = false; // 用户抢庄按钮
@@ -36,6 +38,11 @@ cc.Class({
             for(let j in uCard[i].children){
                 uCard[i].children[j].scale = cc.p(0,1);
             }
+        }
+
+        var sTotalItem = cc.find('Canvas/total/total_small/items').children;
+        for(let i in sTotalItem){
+            sTotalItem[i].active = false;
         }
 
         cc.find("Canvas/total/total_small").active = false; // 小结算
