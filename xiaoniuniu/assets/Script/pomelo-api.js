@@ -4,90 +4,24 @@ module.exports = {
     host: '139.224.134.57',
     port: 3014,
 
-    watcher: function(
-        onAnimPost,
-        onAnimOver,
-        onAnimTimeout,
-        onTimerStart,
-        onSeatTake,
-        onSeatLeave,
-        onSeatBusy,
-        onReadyPost,
-        onReadyOver,
-        onBankerPost,
-        onBankerOver,
-        onDoublePost,
-        onDoubleOver,
-        onOpenPost,
-        onOpenOver,
-        onNextPost,
-        onNextOver,
-        onRoomBusy,
-        onGameOver
-    ) {
-        pomelo.on('onAnimPost', (data) => {
-            onAnimPost(data)
-        });
-        pomelo.on('onAnimOver', (data) => {
-            onAnimOver(data)
-        });
-        pomelo.on('onAnimTimeout', (data) => {
-            onAnimTimeout(data)
-        });
-        pomelo.on('onTimerStart', (data) => {
-            onTimerStart(data)
-        });
-        pomelo.on('onSeatTake', (data) => {
-            onSeatTake(data)
-        });
-        pomelo.on('onSeatLeave', (data) => {
-            onSeatLeave(data)
-        });
-        pomelo.on('onSeatBusy', (data) => {
-            onSeatBusy(data)
-        });
-        pomelo.on('onReadyPost', (data) => {
-            onReadyPost(data)
-        });
-        pomelo.on('onReadyOver', (data) => {
-            onReadyOver(data)
-        });
-        pomelo.on('onBankerPost', (data) => {
-            onBankerPost(data)
-        });
-        pomelo.on('onBankerOver', (data) => {
-            onBankerOver(data)
-        });
-        pomelo.on('onDoublePost', (data) => {
-            onDoublePost(data)
-        });
-        pomelo.on('onDoubleOver', (data) => {
-            onDoubleOver(data)
-        });
-        pomelo.on('onOpenPost', (data) => {
-            onOpenPost(data)
-        });
-        pomelo.on('onOpenOver', (data) => {
-            onOpenOver(data)
-        });
-        pomelo.on('onNextPost', (data) => {
-            onNextPost(data)
-        });
-        pomelo.on('onNextOver', (data) => {
-            onNextOver(data)
-        });
-        pomelo.on('onRoomBusy', (data) => {
-            onRoomBusy(data)
-        });
-        pomelo.on('onGameOver', (data) => {
-            onGameOver(data)
+    // watcher: function(readyWatcher, bankerWatcher, doubleWatcher, openWatcher, nextWatcher) {
+    //     pomelo.on('readyScene', (data) => {readyWatcher(data)});
+    //     pomelo.on('bankerScene', (data) => {bankerWatcher(data)});
+    //     pomelo.on('doubleScene', (data) => {doubleWatcher(data)});
+    //     pomelo.on('openScene', (data) => {openWatcher(data)});
+    //     pomelo.on('nextScene', (data) => {nextWatcher(data)});
+    // },
+
+    watcher: function(watchArr) {      // [{route: 'readyScene', cb: cb}, {route: 'bankerScene', cb: cb}]
+        watchArr.forEach((item) => {
+            pomelo.on(item.route, (data) => {
+                item.cb(data);
+            });
         });
     },
-    // --------------------------------------- init --------------------------------------- //
 
-    getRoomId: function() {
-        return '10010';
-        // 从url获取
+    getRoomId: function() {  // 从url获取
+        return '100015';
     },
 
     getUserInfo: function(cb) {
@@ -99,7 +33,9 @@ module.exports = {
         });
     },
 
-    enterRoom: function(userName, roomId, gameRound, cb) {
+    enterRoom: function(data, cb) {
+        var userName = data.userName, roomId = data.roomId, gameRound = data.gameRound;
+        console.log(data);
         pomelo.init({host: this.host, port: this.port, log: true}, () => {             // 连接gate服务器
             pomelo.request('gate.gateHandler.enter', {userName: userName}, (res) => {
                 pomelo.init({host: res.host, port: res.port, log: true}, () => {       // 连接connector服务器
@@ -111,55 +47,30 @@ module.exports = {
         });
     },
 
-    // --------------------------------------- post --------------------------------------- //
 
-    postSeat: function(currentSeat, lastSeat, cb) {
-        pomelo.request('connector.connectorHandler.postSeat', {currentSeat: currentSeat, lastSeat: lastSeat}, (res) => {
-            cb && cb(res);
-        });
+
+    scenePost: function(scene, anim, button, value, cb) {   //////////////////////////////////////////////////////////////////////////////////////////////////////
+        pomelo.request('connector.connectorHandler.scene', {
+            scene: scene,
+            anim: anim,
+            button: button,
+            value: value
+        }, (res) => {cb && cb(res);});
     },
-
-    postReady: function(cb) {
-        pomelo.request('connector.connectorHandler.postReady', {}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-    postBanker: function(banker, cb) {
-        pomelo.request('connector.connectorHandler.postBanker', {banker: banker}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-    postDouble: function(double, cb) {
-        pomelo.request('connector.connectorHandler.postDouble', {double: double}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-    postOpen: function(cb) {
-        pomelo.request('connector.connectorHandler.postOpen', {}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-    postNext: function(cb) {
-        pomelo.request('connector.connectorHandler.postNext', {}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-    postAnim: function(anim, cb) {
-        pomelo.request('connector.connectorHandler.postAnim', {anim: anim}, (res) => {
-            cb && cb(res);
-        });
-    },
-
-// --------------------------------------- card --------------------------------------- //
 
     getCardAsset: function(path, cb) {
         cc.loader.loadResDir(path, cc.SpriteFrame, (err, cardAsset) => {
             cb && cb(cardAsset);
         });
+    },
+
+    getQuery: function(parameter) {
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == parameter){return pair[1];}
+       }
+       return(false);
     }
 }

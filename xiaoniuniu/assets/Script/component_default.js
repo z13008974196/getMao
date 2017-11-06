@@ -25,7 +25,11 @@ cc.Class({
         cc.find("Canvas/button/button_banker").active = false; // 用户抢庄按钮
 
         cc.find("Canvas/button/button_double").active = false; // 用户加倍按钮
-        // cc.find("Canvas/tip/tip_double").active = false; // 游戏中用户加倍标志
+        // cc.find("Canvas/tip/tip_double").active = false;
+        var tip_double_item = cc.find("Canvas/tip/tip_double").children;
+        for(let i in tip_double_item){
+            tip_double_item[i].active = false;
+        }// 游戏中用户加倍标志
 
         cc.find("Canvas/button/button_clicklast").active = false; // 用户点击最后一张牌按钮
         cc.find("Canvas/button/button_clicklast_icon").active = false; // 用户点击最后一张牌按钮图标

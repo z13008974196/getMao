@@ -52,6 +52,24 @@ module.exports = {
         }
     },
 
+    ////////////////////// 开始动画 //////////////////////
+
+    gameStartAnim: function(cb){
+        cc.find('music/seat').getComponent(cc.AudioSource).play();
+
+        var startAnim_node = cc.find("Canvas/anim/anim_start_img");
+        startAnim_node.active = true;
+        var startAnim_down = cc.moveTo(0.1, cc.p(0,-141));
+        var startAnim_huang = cc.sequence(cc.rotateTo(0.05, -20),cc.rotateTo(0.05, 15),cc.rotateTo(0.05, -10),cc.rotateTo(0.05, 5),cc.rotateTo(0.05, 0));
+        var startAnim_fade = cc.fadeOut(0.25);
+
+        var startAnim_cb = cc.callFunc(function(){
+            cc.find('Canvas/anim/anim_card').active = true;
+            this.sendACard(null, cb);
+        }, this)
+        var startAnim = cc.sequence(startAnim_down, startAnim_huang, cc.delayTime(0.5), startAnim_fade, startAnim_cb);
+        startAnim_node.runAction(startAnim);
+    },
 
     ////////////////////// 发牌动画 //////////////////////
     // 创建节点和动画
@@ -61,21 +79,22 @@ module.exports = {
         var animCards = cc.find('Canvas/anim/anim_card');
         var cardGroup = cc.find('Canvas/gaming/card').children;
         for(let i = 0; i < animPlayerSeatList.length; i++){
-            var poX = cardGroup[animPlayerSeatList[i]].position.x;
-            var poY = cardGroup[animPlayerSeatList[i]].position.y;
-            for (let ind = 1; ind <= 5; ind++) {
+            var groupX = cardGroup[animPlayerSeatList[i]].position.x;
+            var groupY = cardGroup[animPlayerSeatList[i]].position.y;
+            for (let ind = 0; ind < 5; ind++) {
                 var enemy = aCardPool.get();
-                enemy.setPosition(cc.p(-51,0));
+                enemy.setPosition(cc.p(0, 0));
+                var itemX = cardGroup[animPlayerSeatList[i]].children[ind].position.x;
+                var goX = groupX + itemX;
                 if(i == 0){
                     enemy.height = 130;
                     enemy.width = 100;
-                    var bezier = [cc.p(0, 0), cc.p(poX-50, -poY), cc.p(poX + ind*100 - 249, poY)];
-                    // var bezierForward = cc.bezierBy(0.05, bezier);
+                    var bezier = [cc.p(0, 0), cc.p(groupX-50, -groupY), cc.p(goX, groupY)];
                     var anim = cc.bezierBy(0.08, bezier);
                 }else{
                     enemy.height = 104;
                     enemy.width = 80;
-                    var bezier = [cc.p(0, 0), cc.p(poX-500, -poY+500), cc.p(poX + ind*44 - 80, poY)];
+                    var bezier = [cc.p(0, 0), cc.p(groupX-500, -groupY+500), cc.p(goX, groupY)];
                     var anim = cc.bezierBy(0.08, bezier);
                 }
 
@@ -135,22 +154,20 @@ module.exports = {
         }
         // 庄家游戏中位置
         for(let i in playerListSort){
-            if(playerListSort[i].uid == banker){
+            if(i == banker){
                 this.bankerSeat = playerListSort[i].seat;
                 // console.log(playerListSort[i].seat);
             }
         }
     },
 
-    animBankerTip: function(tip, anim_banker_list, startX, endX, cb){
+    animBankerTip: function(bankerAvatarPool, tip, anim_banker_list, startX, endX, cb){
         var self = this;
         console.log('抢庄开始');
-        // if(anim_banker_list.length == 0){
-        //
-        // }
         if(anim_banker_list.length == 1){
             cc.find('Canvas/anim/anim_banker_tip').active = false;
-            if(anim_banker_list.length == 1)anim_banker_list[0].runAction(cc.removeSelf());
+            anim_banker_list[0].getComponent(cc.Sprite).spriteFrame = null;
+            bankerAvatarPool.put(anim_banker_list[0]);
             // 添加庄家标识
             cc.find('Canvas/tip/tip_double').children[self.bankerSeat].getComponent(cc.Sprite).spriteFrame = self.tipDoubleAsset[0];
             cb && cb();
@@ -191,7 +208,7 @@ module.exports = {
             return
         }
 
-        var tip_anim = cc.moveTo(0.2+i*0.15, cc.p(endX, 90));
+        var tip_anim = cc.moveTo(0.1+i*0.15, cc.p(endX, 90));
         var tip_anim_finish = cc.callFunc(function(){
             this.bankerI += 1;
             this.animSelectBanker(target, cb);
@@ -216,7 +233,7 @@ module.exports = {
         cc.find("Canvas/button/button_clicklast").active = false;
         cc.find("Canvas/button/button_clicklast_icon").active = false;
         var myCard = this.myCard;
-        if(myCard.type !=0){ // 有牛
+        if(myCard.type != 0){ // 有牛
             for(let i  in myCard.animation){
                 if(myCard.animation[i] == 0 || myCard.animation[i] == 1 || myCard.animation[i] == 2){
                     this.myUCard[i].runAction(cc.moveBy(0.25, 0, 20));
@@ -227,7 +244,7 @@ module.exports = {
 
     ////////////////////// 亮牌动画 //////////////////////
 
-    openCardAnim: function(data, playerListSort, selfName ,cb){
+    openCardAnim: function(data, playerListSort, selfId ,cb){
         this.allCardOver = data.checkout;
 
         this.makeSmallTotal(data.checkout);
@@ -237,7 +254,7 @@ module.exports = {
         var count = 0;
 
         for(let i in checkout){
-            if(i.split('*')[0] != selfName){ // 不是自己
+            if(i != selfId){ // 不是自己
                 var seat = playerListSort[i].seat;
                 var cardData = checkout[i].cardData;
                 for(let i = 0; i < 5; i++){
@@ -292,9 +309,9 @@ module.exports = {
 
     showSmallTotal: function(){
         if(this.gameResult){
-            cc.find('Canvas/music/win').getComponent(cc.AudioSource).play();
+            cc.find('music/win').getComponent(cc.AudioSource).play();
         }else{
-            cc.find('Canvas/music/lose').getComponent(cc.AudioSource).play();
+            cc.find('music/lose').getComponent(cc.AudioSource).play();
         }
         cc.find('Canvas/mask').active = true;
         var total_small = cc.find('Canvas/total/total_small');
@@ -315,7 +332,7 @@ module.exports = {
             console.log(i);
             console.log(allCardOver[i]);
             smallTotal.children[ind].active = true;
-            var avatar = smallTotal.children[ind].children[0];
+            var avatar = smallTotal.children[ind].children[0].children[0].children[0];
             var name = smallTotal.children[ind].children[1];
             var card = smallTotal.children[ind].children[2];
             var type = smallTotal.children[ind].children[3];

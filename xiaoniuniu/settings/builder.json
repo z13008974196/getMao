@@ -1,7 +1,9 @@
 {
   "appKey": "",
   "appSecret": "",
-  "excludeScenes": [],
+  "excludeScenes": [
+    "8513a336-4ad3-41df-8e47-d3b0628894c2"
+  ],
   "includeAnySDK": false,
   "includeSDKBox": false,
   "includeSdk": [
@@ -22,7 +24,7 @@
   "packageName": "org.cocos2d.helloworld",
   "privateKey": "",
   "renderMode": "0",
-  "startScene": "8513a336-4ad3-41df-8e47-d3b0628894c2",
+  "startScene": "2e6dcd59-8cb5-4542-afa1-c577c267c529",
   "title": "hello_world",
   "webOrientation": "landscape"
 }
