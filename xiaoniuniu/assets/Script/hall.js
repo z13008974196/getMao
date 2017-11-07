@@ -25,10 +25,10 @@ cc.Class({
         cc.find('Canvas/activityPopup').active = false;
 
         // 预加载
-        cc.director.preloadScene('room');
+        // cc.director.preloadScene('room');
 
         // test
-
+        // window.visibilitychange();
     },
 
     gameEnterPage: function(e){

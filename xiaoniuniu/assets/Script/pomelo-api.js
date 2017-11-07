@@ -32,21 +32,41 @@ module.exports = {
             avatar: 'http://img2.imgtn.bdimg.com/it/u=367924068,513092699&fm=214&gp=0.jpg'
         });
     },
+    
+    enterHall: function(data, cb) {
+        var userName = data.userName,
+            roomId = data.roomId,
+            gameRound = data.gameRound,
+            gameSpeed = data.gameSpeed;
 
-    enterRoom: function(data, cb) {
-        var userName = data.userName, roomId = data.roomId, gameRound = data.gameRound;
-        console.log(data);
         pomelo.init({host: this.host, port: this.port, log: true}, () => {             // 连接gate服务器
             pomelo.request('gate.gateHandler.enter', {userName: userName}, (res) => {
                 pomelo.init({host: res.host, port: res.port, log: true}, () => {       // 连接connector服务器
-                    pomelo.request('connector.connectorHandler.enter', {userName: userName, roomId: roomId, gameRound: gameRound}, (res) => {
-                        cb && cb(res);
-                    });
+                    pomelo.request('connector.connectorHandler.enterHall', {}, (res) => {cb && cb(res)});
                 });
             });
         });
     },
 
+    enterRoom: function(data, cb) {
+        var userName = data.userName,
+            roomId = data.roomId,
+            gameRound = data.gameRound,
+            gameSpeed = data.gameSpeed;
+
+        pomelo.init({host: this.host, port: this.port, log: true}, () => {             // 连接gate服务器
+            pomelo.request('gate.gateHandler.enter', {userName: userName}, (res) => {
+                pomelo.init({host: res.host, port: res.port, log: true}, () => {       // 连接connector服务器
+                    pomelo.request('connector.connectorHandler.enterRoom', {
+                        userName: userName,
+                        roomId: roomId,
+                        gameRound: gameRound,
+                        gameSpeed: gameSpeed
+                    }, (res) => {cb && cb(res)});
+                });
+            });
+        });
+    },
 
 
     scenePost: function(scene, anim, button, value, cb) {   //////////////////////////////////////////////////////////////////////////////////////////////////////

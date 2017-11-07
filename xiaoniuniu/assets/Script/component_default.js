@@ -17,7 +17,11 @@ cc.Class({
             user_info_item[i].active = false;
         } // 游戏中用户信息区
 
-        cc.find('Canvas/anim/anim_card').active = false; // 动画牌
+        cc.find('Canvas/anim/anim_card').active = false;
+        var animCard_list = cc.find('Canvas/anim/anim_card').children;
+        for(let i in animCard_list){
+            animCard_list[i].active = false;
+        }// 动画牌
 
         cc.find("Canvas/anim/anim_start_img").active = false; // 开始动画节点
         cc.find("Canvas/anim/anim_banker").active = false; // 抢庄动画节点

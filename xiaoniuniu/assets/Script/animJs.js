@@ -55,6 +55,7 @@ module.exports = {
     ////////////////////// 开始动画 //////////////////////
 
     gameStartAnim: function(cb){
+        console.log('开始动画');
         cc.find('music/seat').getComponent(cc.AudioSource).play();
 
         var startAnim_node = cc.find("Canvas/anim/anim_start_img");
@@ -73,34 +74,37 @@ module.exports = {
 
     ////////////////////// 发牌动画 //////////////////////
     // 创建节点和动画
-    createPlayerAnim: function (animPlayerSeatList, aCardPool){
+    createPlayerAnim: function (animPlayerSeatList){
+        this.sendACardI = 0;
+        this.playerGroup = [];
+        this.animGroup = [];
         animPlayerSeatList.sort(); // 按顺序
         var cardindex = animPlayerSeatList.length * 5;
         var animCards = cc.find('Canvas/anim/anim_card');
         var cardGroup = cc.find('Canvas/gaming/card').children;
+        for(let i = 0; i < animPlayerSeatList.length * 5; i++){
+            var enemy = animCards.children[i];
+            enemy.zIndex = cardindex--;
+            if(i < 5){
+                enemy.height = 130;
+                enemy.width = 100;
+            }
+            animCards.children[i].active = true;
+            this.playerGroup.push(enemy);
+        }
         for(let i = 0; i < animPlayerSeatList.length; i++){
             var groupX = cardGroup[animPlayerSeatList[i]].position.x;
             var groupY = cardGroup[animPlayerSeatList[i]].position.y;
             for (let ind = 0; ind < 5; ind++) {
-                var enemy = aCardPool.get();
-                enemy.setPosition(cc.p(0, 0));
                 var itemX = cardGroup[animPlayerSeatList[i]].children[ind].position.x;
                 var goX = groupX + itemX;
                 if(i == 0){
-                    enemy.height = 130;
-                    enemy.width = 100;
                     var bezier = [cc.p(0, 0), cc.p(groupX-50, -groupY), cc.p(goX, groupY)];
                     var anim = cc.bezierBy(0.08, bezier);
                 }else{
-                    enemy.height = 104;
-                    enemy.width = 80;
                     var bezier = [cc.p(0, 0), cc.p(groupX-500, -groupY+500), cc.p(goX, groupY)];
                     var anim = cc.bezierBy(0.08, bezier);
                 }
-
-                animCards.addChild(enemy, cardindex--);
-
-                this.playerGroup.push(enemy);
                 this.animGroup.push(anim);
             }
         }
@@ -126,7 +130,6 @@ module.exports = {
         for(let i = 0; i < 4; i++){
             var finished = cc.callFunc(function(target, i){
                 if(i == 3){
-                    // var finished = cc.callFunc(this.showBankerStep, this)
                     this.myUCard[i].runAction(cc.scaleTo(0.25, 1, 1));
                     cb && cb();
                     return;
@@ -137,6 +140,40 @@ module.exports = {
 
             var aminSequence = cc.sequence(cc.scaleTo(0.25, 0, 1), finished);
             this.playerGroup[i].runAction(aminSequence);
+        }
+    },
+
+
+    backShowCard: function(animPlayerSeatList, playerListSort){
+        this.playerListSort = playerListSort;
+        var positionList = [];
+        animPlayerSeatList.sort(); // 按顺序
+        var cardindex = animPlayerSeatList.length * 5;
+        var animCards = cc.find('Canvas/anim/anim_card');
+        var cardGroup = cc.find('Canvas/gaming/card').children;
+        for(let i = 0; i < animPlayerSeatList.length; i++){
+            var groupX = cardGroup[animPlayerSeatList[i]].position.x;
+            var groupY = cardGroup[animPlayerSeatList[i]].position.y;
+            for (let ind = 0; ind < 5; ind++) {
+                var itemX = cardGroup[animPlayerSeatList[i]].children[ind].position.x;
+                var goX = groupX + itemX;
+                positionList.push(cc.p(goX, groupY));
+            }
+        }
+        for(let i = 0; i < animPlayerSeatList.length * 5; i++){
+            var enemy = animCards.children[i];
+            enemy.zIndex = cardindex--;
+            if(i < 5){
+                enemy.height = 130;
+                enemy.width = 100;
+            }
+            if(i >= 4){
+                animCards.children[i].active = true;
+                enemy.setPosition(positionList[i]);
+            }else{
+                cardGroup[0].children[i].scale = 1;
+            }
+            this.playerGroup.push(enemy);
         }
     },
 
@@ -165,13 +202,10 @@ module.exports = {
         var self = this;
         console.log('抢庄开始');
         if(anim_banker_list.length == 1){
-            cc.find('Canvas/anim/anim_banker_tip').active = false;
-            anim_banker_list[0].getComponent(cc.Sprite).spriteFrame = null;
-            bankerAvatarPool.put(anim_banker_list[0]);
             // 添加庄家标识
             cc.find('Canvas/tip/tip_double').children[self.bankerSeat].getComponent(cc.Sprite).spriteFrame = self.tipDoubleAsset[0];
             cb && cb();
-            return;
+            return
         }
 
         // 抢庄动画
@@ -217,6 +251,19 @@ module.exports = {
         tip.runAction(aminSequence);
     },
 
+
+    removeBankerTip: function(playerListSort, bankerId){
+        var playerTip = cc.find('Canvas/tip/tip_double').children[playerListSort[bankerId].seat];
+        var position = playerTip.position;
+        var tip = cc.find("Canvas/anim/anim_banker_tip");
+        var bezier = [tip.position, cc.p(680, 380), position];
+        var tipToGameSeatAnim = cc.bezierTo(0.5, bezier);
+        var tipToGameSeatAnimFinish = cc.callFunc(function(){
+            tip.active = false;
+            playerTip.active = true;
+        }, this)
+        tip.runAction(cc.sequence(tipToGameSeatAnim, tipToGameSeatAnimFinish));
+    },
     ////////////////////// 翻转自己最后一张牌 //////////////////////
 
     selfLastACardAnim: function(){
@@ -298,11 +345,6 @@ module.exports = {
             }
             types.children[playerListSort[i].seat].getComponent(cc.Sprite).spriteFrame = this.tipTypeAsset[typeind];
         }
-
-        var self = this;
-        setTimeout(function(){
-            self.showSmallTotal();
-        }, 500)
     },
 
     ////////////////////// 结算动画 //////////////////////
@@ -361,7 +403,9 @@ module.exports = {
             }
 
             // 对应游戏坐位分数
-            userInfo.children[this.playerListSort[i].seat].children[2].children[1].getComponent(cc.Label).string = allCardOver[i].amount;
+            var userInfoValue = userInfo.children[this.playerListSort[i].seat].children[2].children[1].getComponent(cc.Label).string;
+            userInfoValue = parseInt(userInfoValue) + allCardOver[i].amount
+            userInfo.children[this.playerListSort[i].seat].children[2].children[1].getComponent(cc.Label).string = userInfoValue;
 
             ind++;
         }
